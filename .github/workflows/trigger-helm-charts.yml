@@ -8,9 +8,9 @@ on:
     branches:
       - main 
       - master
-    # paths-ignore:
-    #   - .github/workflows/*
-    #   - .github/*
+    paths-ignore:
+      - .github/workflows/*
+      - .github/*
 jobs:
   trigger-helm-charts:
     runs-on: ubuntu-latest

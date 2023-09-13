@@ -88,6 +88,8 @@ config:
   data:
     DEV_PHASE: "dev"
     DISABLE_AUTHENTICATION: false
+    ACCESS_TOKEN_EXPIRES_MINUTES: 30 # 30 minutes
+    REFRESH_TOKEN_EXPIRES_MINUTES: 43200 # 1 month
     POSTGRES_PORT: "5432"
     POSTGRES_DB: "postgres"
     POSTGRES_USER: "postgres"

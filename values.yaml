@@ -87,6 +87,7 @@ config:
     postgresql: grader-api-postgresql
   data:
     DEV_PHASE: "dev"
+    DISABLE_AUTHENTICATION: false
     POSTGRES_PORT: "5432"
     POSTGRES_DB: "postgres"
     POSTGRES_USER: "postgres"

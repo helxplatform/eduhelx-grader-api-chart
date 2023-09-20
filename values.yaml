@@ -85,6 +85,20 @@ config:
   enabled: true
   secrets:
     postgresql: grader-api-postgresql
+  # NOTE: setup-wizard values will only be used one time.
+  # After these are used for the first time, changing them will not do anything.
+  setup_wizard:
+    course:
+      name: COMP555
+    instructors:
+      - onyen: testinstructor
+        first_name: test
+        last_name: instructor
+        email: testinstructor@unc.edu
+      - onyen: foobar
+        first_name: foo
+        last_name: bar
+        email: foobar@unc.edu
   data:
     DEV_PHASE: "dev"
     POSTGRES_PORT: "5432"

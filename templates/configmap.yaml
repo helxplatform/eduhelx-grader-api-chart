@@ -6,4 +6,6 @@ metadata:
 data:
   {{- toYaml .Values.config.data | nindent 2 }}
   POSTGRES_HOST: {{ printf "%s%s" (include "grader-api.fullname" .) "-postgresql" }}
+  SETUP_WIZARD_DATA: |
+    {{ toJson .Values.config.setup_wizard | nindent 4 }}
 {{- end }}

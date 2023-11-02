@@ -104,6 +104,14 @@ config:
     POSTGRES_PORT: "5432"
     POSTGRES_DB: "postgres"
     POSTGRES_USER: "postgres"
+    LDAP_HOST: "ldap.unc.edu"
+    LDAP_PORT: 636
+    LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"
+    LDAP_SERVICE_ACCOUNT_PASSWORD:
+      type: secret
+      value: ""
+    LDAP_TIMEOUT_SECONDS: 5
+
 
 postgresql:
   auth:

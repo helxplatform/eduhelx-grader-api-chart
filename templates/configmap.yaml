@@ -4,7 +4,18 @@ kind: ConfigMap
 metadata:
   name: {{ include "grader-api.fullname" . }}
 data:
-  {{- toYaml .Values.config.data | nindent 2 }}
+  # This Helm template iterates through the data in the `config.data` section of the values.
+  # It checks each key-value pair to determine if the value is a map AND has the attribute type: "secret".
+  # If it is not, then it will include it from the configmap here.
+  {{- range $key, $value := .Values.config.data }}
+  {{- if or (ne (kindOf $value) "map") (ne $value.type "secret") }}
+    {{- if eq (kindOf $value) "map" }}
+      {{- $key | nindent 2 }}: {{ toYaml $value.value }}
+    {{ else }}
+      {{- $key | nindent 2 }}: {{ toYaml $value }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
   POSTGRES_HOST: {{ printf "%s%s" (include "grader-api.fullname" .) "-postgresql" }}
   SETUP_WIZARD_DATA: |
     {{ toJson .Values.config.setup_wizard | nindent 4 }}

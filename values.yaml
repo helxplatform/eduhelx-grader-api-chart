@@ -85,11 +85,33 @@ config:
   enabled: true
   secrets:
     postgresql: grader-api-postgresql
+  # NOTE: setup-wizard values will only be used one time.
+  # After these are used for the first time, changing them will not do anything.
+  setup_wizard:
+    course:
+      name: COMP555
+    instructors:
+      - onyen: testinstructor
+        first_name: test
+        last_name: instructor
+        email: testinstructor@unc.edu
+      - onyen: foobar
+        first_name: foo
+        last_name: bar
+        email: foobar@unc.edu
   data:
     DEV_PHASE: "dev"
     POSTGRES_PORT: "5432"
     POSTGRES_DB: "postgres"
     POSTGRES_USER: "postgres"
+    LDAP_HOST: "ldap.unc.edu"
+    LDAP_PORT: 636
+    LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"
+    LDAP_SERVICE_ACCOUNT_PASSWORD:
+      type: secret
+      value: ""
+    LDAP_TIMEOUT_SECONDS: 5
+
 
 postgresql:
   auth:

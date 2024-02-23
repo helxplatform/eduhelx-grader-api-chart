@@ -1,6 +1,6 @@
 apiVersion: v2
-name: grader-api
-description: A Helm chart to deploy the eduhelx grader API
+name: eduhelx-grader-api
+description: A Helm chart to deploy the EduHeLx Grader API
 
 # A chart can be either an 'application' or a 'library' chart.
 #

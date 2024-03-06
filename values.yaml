@@ -8,7 +8,7 @@ image:
   repository: containers.renci.org/helxplatform/grader-api
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: latest
 
 imagePullSecrets: []
 nameOverride: ""
@@ -83,14 +83,13 @@ affinity: {}
 
 config:
   enabled: true
-  secrets:
-    postgresql: grader-api-postgresql
   data:
-    DEV_PHASE: "dev"
+    DEV_PHASE: dev
     POSTGRES_PORT: "5432"
-    POSTGRES_DB: "postgres"
-    POSTGRES_USER: "postgres"
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
 
 postgresql:
+  enabled: true
   auth:
-    existingSecret: "grader-api-postgresql"
+    existingSecret: grader-api-postgresql

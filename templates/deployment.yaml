@@ -54,15 +54,19 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/grader-config
+            {{- if .Values.postgresql.enabled }}
             - name: secret
               mountPath: /etc/grader-secret
+            {{- end }}
       volumes:
         - name: config
           configMap:
             name: {{ include "grader-api.fullname" . }}
+        {{- if .Values.postgresql.enabled }}
         - name: secret
           secret:
-            secretName: {{ .Values.config.secrets.postgresql }}
+            secretName: {{ .Values.postgresql.auth.existingSecret }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

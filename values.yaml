@@ -85,9 +85,20 @@ config:
   enabled: true
   data:
     DEV_PHASE: dev
+    GITEA_ASSIST_API_URL: <change-me>
     POSTGRES_PORT: "5432"
     POSTGRES_DB: postgres
     POSTGRES_USER: postgres
+    LDAP_HOST: ldap.unc.edu
+    LDAP_PORT: "636"
+    LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"
+    LDAP_TIMEOUT_SECONDS: "5"
+  secretData:
+    # -- # E.g. run `secrets.token_urlsafe(64)` in a Python 3 shell to generate this value.
+    # The JWT secret key is a private key used to sign/verify that a JWT is issued by the server.
+    JWT_SECRET_KEY: "<change-me>"
+    # -- The account password for the LDAP service
+    LDAP_SERVICE_ACCOUNT_PASSWORD: "<change-me>"
 
 postgresql:
   enabled: true

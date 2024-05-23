@@ -89,6 +89,8 @@ config:
     POSTGRES_PORT: "5432"
     POSTGRES_DB: postgres
     POSTGRES_USER: postgres
+    STUDENT_APPSTORE_HOST: "http://my-student-appstore-service:8000"
+    INSTRUCTOR_APPSTORE_HOST: "http://my-instructor-appstore-service:8000"
     LDAP_HOST: ldap.unc.edu
     LDAP_PORT: "636"
     LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"

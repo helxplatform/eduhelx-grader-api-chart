@@ -85,6 +85,7 @@ config:
   enabled: true
   data:
     DEV_PHASE: dev
+    GITEA_SSH_URL: ssh://git@<my-gitea-ssh-svc>:2222
     GITEA_ASSIST_API_URL: <change-me>
     POSTGRES_PORT: "5432"
     POSTGRES_DB: postgres

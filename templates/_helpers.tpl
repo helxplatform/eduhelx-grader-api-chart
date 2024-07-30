@@ -60,3 +60,10 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Print the Grader API postgresql secret name
+*/}}
+{{- define "grader-api.postgresqlSecretName" -}}
+{{- printf "%s" .Values.postgresql.auth.existingSecret }}
+{{- end }}

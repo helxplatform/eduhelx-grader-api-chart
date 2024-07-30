@@ -24,7 +24,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "grader-api.serviceAccountName" . }}
+      serviceAccountName: {{ include "grader-api.fullname" . }}-sa
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -51,18 +51,15 @@ spec:
               port: 8000
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: config
-              mountPath: /etc/grader-config
-            - name: secret
-              mountPath: /etc/grader-secret
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "grader-api.fullname" . }}
-        - name: secret
-          secret:
-            secretName: {{ .Values.config.secrets.postgresql }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "grader-api.fullname" . }}
+          - secretRef:
+              name: {{ include "grader-api.fullname" . }}
+          {{- if .Values.postgresql.enabled }}
+          - secretRef:
+              name: {{ .Values.postgresql.auth.existingSecret }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

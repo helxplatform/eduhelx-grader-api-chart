@@ -96,6 +96,7 @@ config:
     LDAP_PORT: "636"
     LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"
     LDAP_TIMEOUT_SECONDS: "5"
+    NUM_WORKERS: "4"
   secretData:
     # -- # E.g. run `secrets.token_urlsafe(64)` in a Python 3 shell to generate this value.
     # The JWT secret key is a private key used to sign/verify that a JWT is issued by the server.

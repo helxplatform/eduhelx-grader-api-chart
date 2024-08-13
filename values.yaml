@@ -96,10 +96,14 @@ config:
     LDAP_PORT: "636"
     LDAP_SERVICE_ACCOUNT_BIND_DN: "cn=unc:app:renci:eduhelx,ou=Applications,dc=unc,dc=edu"
     LDAP_TIMEOUT_SECONDS: "5"
+    NUM_WORKERS: "4"
   secretData:
     # -- # E.g. run `secrets.token_urlsafe(64)` in a Python 3 shell to generate this value.
     # The JWT secret key is a private key used to sign/verify that a JWT is issued by the server.
     JWT_SECRET_KEY: "<change-me>"
+    # The bearer token used to authenticate with Gitea Assist. The value is encoded in Gitea Assist's
+    # credential secret (`config.secrets.creds` in the gitea-assist chart values)
+    GITEA_ASSIST_AUTH_TOKEN: "<change-me>"
     # -- The account password for the LDAP service
     LDAP_SERVICE_ACCOUNT_PASSWORD: "<change-me>"
 

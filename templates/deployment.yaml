@@ -47,12 +47,12 @@ spec:
             httpGet:
               path: /docs
               port: 8000
-            initialDelaySeconds: 120
+            initialDelaySeconds: 60
           readinessProbe:
             httpGet:
               path: /docs
               port: 8000
-            initialDelaySeconds: 120
+            initialDelaySeconds: 60
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:

@@ -77,30 +77,28 @@ spec:
             "--concurrency", "{{ .Values.celery.worker.options.concurrency }}",
             "--loglevel", "{{ .Values.celery.worker.options.loglevel }}"
           ]
-          # livenessProbe:
-          #   exec:
-          #     command: [
-          #       "celery",
-          #       "-A", "app.celery",
-          #       "inspect",
-          #       "ping",
-          #       # "-d", "celery@$HOSTNAME",
-          #       "--timeout", "5"
-          #     ]
-          #   initialDelaySeconds: 60
-          #   timeoutSeconds: 10
-          # readinessProbe:
-          #   exec:
-          #     command: [
-          #       "celery",
-          #       "-A", "app.celery",
-          #       "inspect",
-          #       "ping",
-          #       # "-d", "celery@$HOSTNAME",
-          #       "--timeout", "5"
-          #     ]
-          #   initialDelaySeconds: 60
-          #   timeoutSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "5"
+              ]
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "5"
+              ]
+            timeoutSeconds: 10
           resources:
             {{- toYaml .Values.celery.worker.resources | nindent 12 }}
           envFrom:
@@ -127,6 +125,28 @@ spec:
             "beat",
             "--loglevel", "{{ .Values.celery.beat.options.loglevel }}"
           ]
+          livenessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "5"
+              ]
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "5"
+              ]
+            timeoutSeconds: 10
           resources:
             {{- toYaml .Values.celery.beat.resources | nindent 12 }}
           envFrom:

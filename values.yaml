@@ -86,18 +86,25 @@ celery:
   flower:
     enabled: true
     auth:
-      username: test
+      username: admin
       password: ""
     service:
       type: ClusterIP
       port: 5555
-  workerOptions:
-    name: worker
-    pool: prefork
-    concurrency: 4
-    loglevel: info
-  securityContext: {}
-  resources: {}
+    resources: {}
+    securityContext: {}
+  worker:
+    options:
+      pool: prefork
+      concurrency: 4
+      loglevel: info
+    resources: {}
+    securityContext: {}
+  beat:
+    options:
+      loglevel: info
+    resources: {}
+    securityContext: {}
 
 config:
   enabled: true

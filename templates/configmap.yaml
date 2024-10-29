@@ -6,4 +6,18 @@ metadata:
 data:
   {{- toYaml .Values.config.data | nindent 2 }}
   POSTGRES_HOST: {{ printf "%s-%s" (include "grader-api.fullname" .) "postgresql" }}
+  # BROKER_HOST: {{ printf "%s-%s" (include "grader-api.fullname" .) "rabbitmq" }}
+  # {{- if .Values.rabbitmq.auth.tls.enabled }}
+  # BROKER_PORT: "{{ .Values.rabbitmq.service.ports.amqptls }}"
+  # {{- else }}
+  # BROKER_PORT: "{{ .Values.rabbitmq.service.ports.amqp }}"
+  # {{- end }}
+  # BROKER_USER: {{ .Values.rabbitmq.auth.username }}
+  BROKER_HOST: {{ printf "%s-%s" (include "grader-api.fullname" .) "redis-master" }}
+  {{ if .Values.redis.sentinel.enabled }}
+  BROKER_PORT: "{{ .Values.redis.sentinel.service.ports.redis }}"
+  {{ else }}
+  BROKER_PORT: "{{ .Values.redis.master.service.ports.redis }}"
+  {{ end }}
+  BROKER_USER: default
 {{- end }}

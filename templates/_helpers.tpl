@@ -78,13 +78,6 @@ Print the Grader API postgresql secret name
 {{- end }}
 
 {{/*
-Print the Grader API rabbitmq secret name
-*/}}
-{{- define "grader-api.rabbitmqSecretName" -}}
-{{- printf "%s" .Values.rabbitmq.auth.existingPasswordSecret }}
-{{- end }}
-
-{{/*
 Print the Grader API redis secret name
 */}}
 {{- define "grader-api.redisSecretName" -}}

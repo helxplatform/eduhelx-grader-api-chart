@@ -37,11 +37,6 @@ spec:
             - -c
             - until pg_isready -h {{ include "grader-api.fullname" . }}-postgresql -p 5432 -U postgres; do echo "waiting for postgresql"; sleep 5; done
         {{- end }}
-        {{ if .Values.rabbitmq.enabled }}
-        - name: wait-for-rabbitmq
-          image: busybox:1.28
-          command: ['sh', '-c', 'until nc -z {{ printf "%s%s" (include "grader-api.fullname" .) "-rabbitmq" }} 5672; do echo waiting for rabbitmq; sleep 2; done;']
-        {{ end }}
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
           image: goodsmileduck/redis-cli:6.0.4
@@ -117,10 +112,6 @@ spec:
           - secretRef:
               name: {{ .Values.postgresql.auth.existingSecret }}
           {{- end }}
-          {{- if .Values.rabbitmq.enabled }}
-          - secretRef:
-              name: {{ .Values.rabbitmq.auth.existingPasswordSecret }}
-          {{- end }}
           {{- if .Values.redis.enabled }}
           - secretRef:
               name: {{ .Values.redis.auth.existingSecret }}
@@ -158,10 +149,6 @@ spec:
           {{- if .Values.postgresql.enabled }}
           - secretRef:
               name: {{ .Values.postgresql.auth.existingSecret }}
-          {{- end }}
-          {{- if .Values.rabbitmq.enabled }}
-          - secretRef:
-              name: {{ .Values.rabbitmq.auth.existingPasswordSecret }}
           {{- end }}
           {{- if .Values.redis.enabled }}
           - secretRef:

@@ -140,15 +140,3 @@ redis:
   enabled: true
   auth:
     existingSecret: grader-api-redis-password
-
-rabbitmq:
-  enabled: false
-  auth:
-    username: grader-api-rabbitmq
-    existingPasswordSecret: grader-api-rabbitmq-password
-    tls:
-      enabled: false
-  service:
-    ports:
-      amqp: 5672
-      amqptls: 5671

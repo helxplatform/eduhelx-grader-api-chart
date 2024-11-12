@@ -25,10 +25,12 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  runAsGroup: 0
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  runAsGroup: 0
   # capabilities:
   #   drop:
   #   - ALL
@@ -91,7 +93,8 @@ celery:
       type: ClusterIP
       port: 5555
     resources: {}
-    securityContext: {}
+    securityContext:
+      runAsGroup: 0
     livenessProbe:
       initialDelaySeconds: 30
       periodSeconds: 30
@@ -106,7 +109,8 @@ celery:
       concurrency: 4
       loglevel: info
     resources: {}
-    securityContext: {}
+    securityContext:
+      runAsGroup: 0
     livenessProbe:
       initialDelaySeconds: 30
       periodSeconds: 30
@@ -119,7 +123,8 @@ celery:
     options:
       loglevel: info
     resources: {}
-    securityContext: {}
+    securityContext:
+      runAsGroup: 0
     livenessProbe:
       initialDelaySeconds: 30
       periodSeconds: 30
@@ -128,6 +133,8 @@ celery:
       initialDelaySeconds: 30
       periodSeconds: 10
       timeoutSeconds: 10
+  podSecurityContext:
+    runAsGroup: 0
 
 config:
   enabled: true

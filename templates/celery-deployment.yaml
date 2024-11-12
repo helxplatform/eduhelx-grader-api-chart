@@ -26,7 +26,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "grader-api.fullname" . }}-sa
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.celery.podSecurityContext | nindent 8 }}
       initContainers:
         {{- if .Values.postgresql.enabled }}
         - name: wait-for-postgresql

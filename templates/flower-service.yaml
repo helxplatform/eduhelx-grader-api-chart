@@ -1,0 +1,17 @@
+{{- if .Values.celery.flower.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "grader-api.fullname" . }}-flower
+  labels:
+    {{- include "grader-api.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.celery.flower.service.type }}
+  ports:
+    - port: {{ .Values.celery.flower.service.port }}
+      targetPort: 5555
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "grader-api.flowerSelectorLabels" . | nindent 4 }}
+{{- end }}

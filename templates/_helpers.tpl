@@ -51,6 +51,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Flower selector labels
+*/}}
+{{- define "grader-api.flowerSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "grader-api.name" . }}-flower
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "grader-api.serviceAccountName" -}}
@@ -66,4 +75,11 @@ Print the Grader API postgresql secret name
 */}}
 {{- define "grader-api.postgresqlSecretName" -}}
 {{- printf "%s" .Values.postgresql.auth.existingSecret }}
+{{- end }}
+
+{{/*
+Print the Grader API redis secret name
+*/}}
+{{- define "grader-api.redisSecretName" -}}
+{{- printf "%s" .Values.redis.auth.existingSecret }}
 {{- end }}

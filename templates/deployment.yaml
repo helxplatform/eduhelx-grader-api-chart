@@ -28,9 +28,15 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        - name: wait-for-postgres
-          image: busybox:1.28
-          command: ['sh', '-c', 'until nc -z {{ printf "%s%s" (include "grader-api.fullname" .) "-postgresql" }} 5432; do echo waiting for postgres; sleep 2; done;']
+        {{- if .Values.postgresql.enabled }}
+        - name: wait-for-postgresql
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: "{{ .Values.postgresql.image.pullPolicy }}"
+          command:
+            - sh
+            - -c
+            - until pg_isready -h {{ include "grader-api.fullname" . }}-postgresql -p 5432 -U postgres; do echo "waiting for postgresql"; sleep 5; done
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -65,6 +71,10 @@ spec:
           {{- if .Values.postgresql.enabled }}
           - secretRef:
               name: {{ .Values.postgresql.auth.existingSecret }}
+          {{- end }}
+          {{- if .Values.redis.enabled }}
+          - secretRef:
+              name: {{ .Values.redis.auth.existingSecret }}
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

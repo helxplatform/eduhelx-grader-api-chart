@@ -25,10 +25,12 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  runAsGroup: 0
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  runAsGroup: 0
   # capabilities:
   #   drop:
   #   - ALL
@@ -81,15 +83,74 @@ tolerations: []
 
 affinity: {}
 
+celery:
+  flower:
+    enabled: true
+    auth:
+      username: admin
+      password: ""
+    service:
+      type: ClusterIP
+      port: 5555
+    resources: {}
+    securityContext:
+      runAsGroup: 0
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
+  worker:
+    options:
+      pool: prefork
+      concurrency: 4
+      loglevel: info
+    resources: {}
+    securityContext:
+      runAsGroup: 0
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
+  beat:
+    options:
+      loglevel: info
+    resources: {}
+    securityContext:
+      runAsGroup: 0
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
+  podSecurityContext:
+    runAsGroup: 0
+
 config:
   enabled: true
   data:
     DEV_PHASE: dev
+    DOCUMENTATION_URL: https://renci.atlassian.net/wiki/spaces/EHI/overview
     GITEA_SSH_URL: ssh://git@<my-gitea-ssh-svc>:2222
     GITEA_ASSIST_API_URL: <change-me>
     POSTGRES_PORT: "5432"
     POSTGRES_DB: postgres
     POSTGRES_USER: postgres
+    CANVAS_API_KEY: "YOUR_API_KEY"
+    CANVAS_API_URL: "https://uncch.instructure.com/api/v1"
+    CANVAS_COURSE_ID: "12345"
+    CANVAS_COURSE_START_DATE: "1970-01-01T00:00:00Z"
+    CANVAS_COURSE_END_DATE: "9999-01-01T00:00:00Z"
     STUDENT_APPSTORE_HOST: "http://my-student-appstore-service:8000"
     INSTRUCTOR_APPSTORE_HOST: "http://my-instructor-appstore-service:8000"
     LDAP_HOST: ldap.unc.edu
@@ -118,3 +179,8 @@ postgresql:
   enabled: true
   auth:
     existingSecret: grader-api-postgresql
+
+redis:
+  enabled: true
+  auth:
+    existingSecret: grader-api-redis-password

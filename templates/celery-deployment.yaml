@@ -1,0 +1,227 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "grader-api.fullname" . }}-celery
+  labels:
+    {{- include "grader-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "grader-api.flowerSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "grader-api.flowerSelectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "grader-api.fullname" . }}-sa
+      securityContext:
+        {{- toYaml .Values.celery.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- if .Values.postgresql.enabled }}
+        - name: wait-for-postgresql
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: "{{ .Values.postgresql.image.pullPolicy }}"
+          command:
+            - sh
+            - -c
+            - until pg_isready -h {{ include "grader-api.fullname" . }}-postgresql -p 5432 -U postgres; do echo "waiting for postgresql"; sleep 5; done
+        {{- end }}
+        {{ if .Values.redis.enabled }}
+        - name: wait-for-redis
+          image: goodsmileduck/redis-cli:6.0.4
+          command: ['sh', '-c', 'until [ "$(redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a ${REDIS_PASSWORD} --user ${REDIS_USER} ping | grep PONG)" = "PONG" ]; do echo waiting for redis; sleep 2; done;']
+          env:
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "grader-api.fullname" . }}
+                key: BROKER_HOST
+          - name: REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "grader-api.fullname" . }}
+                key: BROKER_PORT
+          - name: REDIS_USER
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "grader-api.fullname" . }}
+                key: BROKER_USER
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "grader-api.redisSecretName" . }}
+                key: BROKER_PASSWORD
+        {{ end }}
+      containers:
+        - name: celery-worker
+          securityContext:
+            {{- toYaml .Values.celery.worker.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["celery"]
+          args: [
+            "-A", "app.celery",
+            "worker",
+            "--pool", "{{ .Values.celery.worker.options.pool }}",
+            "--concurrency", "{{ .Values.celery.worker.options.concurrency }}",
+            "--loglevel", "{{ .Values.celery.worker.options.loglevel }}"
+          ]
+          livenessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "{{ .Values.celery.worker.livenessProbe.timeoutSeconds }}"
+              ]
+            timeoutSeconds: {{ .Values.celery.worker.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.worker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.worker.livenessProbe.periodSeconds }}
+          readinessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "{{ .Values.celery.worker.readinessProbe.timeoutSeconds }}"
+              ]
+            timeoutSeconds: {{ .Values.celery.worker.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.worker.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.worker.readinessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.celery.worker.resources | nindent 12 }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "grader-api.fullname" . }}
+          - secretRef:
+              name: {{ include "grader-api.fullname" . }}
+          {{- if .Values.postgresql.enabled }}
+          - secretRef:
+              name: {{ .Values.postgresql.auth.existingSecret }}
+          {{- end }}
+          {{- if .Values.redis.enabled }}
+          - secretRef:
+              name: {{ .Values.redis.auth.existingSecret }}
+          {{- end }}
+        - name: celery-beat
+          securityContext:
+            {{- toYaml .Values.celery.beat.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["celery"]
+          args: [
+            "-A", "app.celery",
+            "beat",
+            "--loglevel", "{{ .Values.celery.beat.options.loglevel }}"
+          ]
+          livenessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "{{ .Values.celery.beat.livenessProbe.timeoutSeconds }}"
+              ]
+            timeoutSeconds: {{ .Values.celery.beat.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.beat.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.beat.livenessProbe.periodSeconds }}
+          readinessProbe:
+            exec:
+              command: ["celery"]
+              args: [
+                "-A", "app.celery",
+                "inspect",
+                "ping",
+                "-d", "celery@$HOSTNAME",
+                "--timeout", "{{ .Values.celery.beat.readinessProbe.timeoutSeconds }}"
+              ]
+            timeoutSeconds: {{ .Values.celery.beat.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.beat.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.beat.readinessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.celery.beat.resources | nindent 12 }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "grader-api.fullname" . }}
+          - secretRef:
+              name: {{ include "grader-api.fullname" . }}
+          {{- if .Values.postgresql.enabled }}
+          - secretRef:
+              name: {{ .Values.postgresql.auth.existingSecret }}
+          {{- end }}
+          {{- if .Values.redis.enabled }}
+          - secretRef:
+              name: {{ .Values.redis.auth.existingSecret }}
+          {{- end }}
+        {{- if .Values.celery.flower.enabled }}
+        - name: celery-flower
+          securityContext:
+            {{- toYaml .Values.celery.flower.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["celery"]
+          args: [
+            "-A", "app.celery",
+            "flower"
+          ]
+          ports:
+            - name: http
+              containerPort: 5555
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 5555
+            timeoutSeconds: {{ .Values.celery.flower.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.flower.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.flower.livenessProbe.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: 5555
+            timeoutSeconds: {{ .Values.celery.flower.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.flower.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.flower.readinessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.celery.flower.resources | nindent 12 }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "grader-api.fullname" . }}
+          - secretRef:
+              name: {{ include "grader-api.fullname" . }}
+          {{- if .Values.postgresql.enabled }}
+          - secretRef:
+              name: {{ .Values.postgresql.auth.existingSecret }}
+          {{- end }}
+          {{- if .Values.redis.enabled }}
+          - secretRef:
+              name: {{ .Values.redis.auth.existingSecret }}
+          {{- end }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

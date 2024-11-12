@@ -81,7 +81,6 @@ tolerations: []
 
 affinity: {}
 
-
 celery:
   flower:
     enabled: true
@@ -93,6 +92,14 @@ celery:
       port: 5555
     resources: {}
     securityContext: {}
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
   worker:
     options:
       pool: prefork
@@ -100,11 +107,27 @@ celery:
       loglevel: info
     resources: {}
     securityContext: {}
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
   beat:
     options:
       loglevel: info
     resources: {}
     securityContext: {}
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
 
 config:
   enabled: true

@@ -85,9 +85,11 @@ spec:
                 "inspect",
                 "ping",
                 "-d", "celery@$HOSTNAME",
-                "--timeout", "5"
+                "--timeout", "{{ .Values.celery.worker.livenessProbe.timeoutSeconds }}"
               ]
-            timeoutSeconds: 10
+            timeoutSeconds: {{ .Values.celery.worker.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.worker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.worker.livenessProbe.periodSeconds }}
           readinessProbe:
             exec:
               command: ["celery"]
@@ -96,9 +98,11 @@ spec:
                 "inspect",
                 "ping",
                 "-d", "celery@$HOSTNAME",
-                "--timeout", "5"
+                "--timeout", "{{ .Values.celery.worker.readinessProbe.timeoutSeconds }}"
               ]
-            timeoutSeconds: 10
+            timeoutSeconds: {{ .Values.celery.worker.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.worker.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.worker.readinessProbe.periodSeconds }}
           resources:
             {{- toYaml .Values.celery.worker.resources | nindent 12 }}
           envFrom:
@@ -133,9 +137,11 @@ spec:
                 "inspect",
                 "ping",
                 "-d", "celery@$HOSTNAME",
-                "--timeout", "5"
+                "--timeout", "{{ .Values.celery.beat.livenessProbe.timeoutSeconds }}"
               ]
-            timeoutSeconds: 10
+            timeoutSeconds: {{ .Values.celery.beat.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.beat.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.beat.livenessProbe.periodSeconds }}
           readinessProbe:
             exec:
               command: ["celery"]
@@ -144,9 +150,11 @@ spec:
                 "inspect",
                 "ping",
                 "-d", "celery@$HOSTNAME",
-                "--timeout", "5"
+                "--timeout", "{{ .Values.celery.beat.readinessProbe.timeoutSeconds }}"
               ]
-            timeoutSeconds: 10
+            timeoutSeconds: {{ .Values.celery.beat.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.beat.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.beat.readinessProbe.periodSeconds }}
           resources:
             {{- toYaml .Values.celery.beat.resources | nindent 12 }}
           envFrom:
@@ -180,11 +188,15 @@ spec:
           livenessProbe:
             tcpSocket:
               port: 5555
-            initialDelaySeconds: 60
+            timeoutSeconds: {{ .Values.celery.flower.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.flower.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.flower.livenessProbe.periodSeconds }}
           readinessProbe:
             tcpSocket:
               port: 5555
-            initialDelaySeconds: 60
+            timeoutSeconds: {{ .Values.celery.flower.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.celery.flower.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.celery.flower.readinessProbe.periodSeconds }}
           resources:
             {{- toYaml .Values.celery.flower.resources | nindent 12 }}
           envFrom:

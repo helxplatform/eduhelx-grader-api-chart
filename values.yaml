@@ -138,6 +138,13 @@ config:
     # -- The account password for the LDAP service
     LDAP_SERVICE_ACCOUNT_PASSWORD: "<change-me>"
 
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 30
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
 postgresql:
   enabled: true
   auth:
